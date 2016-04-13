@@ -1,0 +1,36 @@
+group 'com.LastProject.iip'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.5
+
+compileJava.options.encoding = 'UTF-8'
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile 'org.springframework:spring-webmvc:4.2.5.RELEASE'
+    compile 'org.projectlombok:lombok:1.16.8'
+
+    //view
+    compile 'org.webjars:jquery:2.2.2'
+    compile 'org.webjars:bootstrap:3.3.6'
+
+
+    //servlet jsp jstl
+    compile 'javax.servlet:jstl:1.2'
+    compile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.1'
+    compile 'javax.servlet:javax.servlet-api:3.1.0'
+
+
+    compile 'org.springframework.data:spring-data-elasticsearch:2.0.0.RELEASE'
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'org.json:json:20160212'
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+
+}
