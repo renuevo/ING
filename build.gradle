@@ -17,10 +17,13 @@ dependencies {
     compile 'org.springframework:spring-webmvc:4.2.5.RELEASE'
     compile 'org.projectlombok:lombok:1.16.8'
 
+
     //view
     compile 'org.webjars:jquery:2.2.2'
     compile 'org.webjars:bootstrap:3.3.6'
-
+    compile 'org.webjars.bower:semantic-ui:2.1.8'
+    compile 'org.apache.tiles:tiles-extras:3.0.5'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
 
     //servlet jsp jstl
     compile 'javax.servlet:jstl:1.2'

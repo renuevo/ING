@@ -5,7 +5,6 @@ import com.ING.model.StudyElement;
 import com.ING.service.ElasticsearchService;
 import com.google.gson.Gson;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -14,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
@@ -33,12 +33,6 @@ public class ElasticsearchServiceIMP implements ElasticsearchService{
     @Autowired
     private ElasticsearchOperations elasticsearchTemplate;
 
-    private QueryBuilder[] makeQuery(String query){
-        QueryBuilder queryBuilder[] = { QueryBuilders.matchPhrasePrefixQuery("keyword", query).maxExpansions(10),
-                QueryBuilders.wildcardQuery("keyword", query), QueryBuilders.simpleQueryStringQuery(query),
-                QueryBuilders.fuzzyQuery("keyword", query).fuzziness(Fuzziness.AUTO) };
-        return queryBuilder;
-    }
 
     @Override
     public void inputData() throws IOException, ParseException {
@@ -49,9 +43,10 @@ public class ElasticsearchServiceIMP implements ElasticsearchService{
         elasticsearchTemplate.createIndex(StudyElement.class);
         elasticsearchTemplate.refresh(StudyElement.class);
 
-        Object object = jsonParser.parse(new FileReader("C:/dev/LastProject/ING/src/main/webapp/resources/please.json"));
+        String filePath = new ClassPathResource("./json/middle _math.json").getFile().getAbsolutePath();
+        Object object = jsonParser.parse(new FileReader(filePath));
         JSONObject jsonObject = (JSONObject)object;
-        JSONArray jsonArray = (JSONArray) jsonObject.get("bindings");
+        JSONArray jsonArray = (JSONArray) jsonObject.get("content");
         for(Object data : jsonArray){
             JSONObject JsonData = (JSONObject) data;
             String unit = JsonData.get("unit").toString();
@@ -75,28 +70,17 @@ public class ElasticsearchServiceIMP implements ElasticsearchService{
     }
 
     @Override
-    public String searchData(String query) throws UnknownHostException {
-       // QueryBuilder queryBuilder[]= makeQuery(query);
+    public List<Map> searchData(String query) throws UnknownHostException {
         QueryBuilder reformQuery =  QueryBuilders.matchPhrasePrefixQuery("keyword",query);
-
         SearchResponse searchResponse = ElasticsearchClient.shareClient().prepareSearch("study")
                 .setQuery(reformQuery).execute().actionGet();
-        //.setFetchSource(new String[]{"unit","grade"},null)
         ElasticsearchClient.shareClient().close();
-
-        List<StudyElement> units = new ArrayList<StudyElement>();
-
+        List<Map> units = new ArrayList<Map>();
         for(SearchHit hit : searchResponse.getHits()){
             Map<String, Object> map = hit.getSource();
-            String unit = map.get("unit").toString();
-            String grade = map.get("grade").toString();
-            String schoolClass = map.get("schoolclass").toString();
-            String postUnit = map.get("postunit").toString();
-            String preUnit = map.get("preunit").toString();
-            StudyElement studyElement = new StudyElement(unit,grade,schoolClass,postUnit,preUnit,null);
-            units.add(studyElement);
+            units.add(map);
         }
-        return new Gson().toJson(units);
+        return units;
     }
 
 

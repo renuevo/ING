@@ -25,7 +25,7 @@ public class HomeController {
     @RequestMapping(value="/")
     public ModelAndView home()
     {
-        ModelAndView model = new ModelAndView("home");
+        ModelAndView model = new ModelAndView("index");
 
         return model;
     }
@@ -37,10 +37,18 @@ public class HomeController {
         return model;
     }
 
+    @RequestMapping(value="/searchs",method = RequestMethod.GET)
+    public ModelAndView searchs(HttpServletRequest request,ModelAndView model) throws UnknownHostException {
+        String query = request.getParameter("query");
+        model.setViewName("jsonView");
+        model.addObject("children",elasticsearchService.searchData(query));
+        return model;
+    }
+
     @RequestMapping(value="/search",method = RequestMethod.GET)
     public void search(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
         String query = request.getParameter("query");
-        String resultJson = elasticsearchService.searchData(query);
+        String resultJson = "S";
         try{
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
